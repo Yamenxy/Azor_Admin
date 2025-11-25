@@ -31,30 +31,28 @@
 </div>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycbzbBa_MjYAgva6EzV3h8ZnM50w3dcVuu8t6MnNW70GK5eiQFP_GlwRiFFG0SINhcsipzA/exec";
+const API = "https://script.google.com/macros/s/AKfycbylGD-wJ3ZEtd-VAbmUqJHpUT2oMDGU0QVKxvrVjwvDdt48K4Eq4WzztDDD8jvTpD16hg/exec";
 
 const alerts = document.getElementById('alerts');
 function showAlert(msg,type='success'){ alerts.innerHTML = `<div class="alert alert-${type}">${msg}</div>`; setTimeout(()=>alerts.innerHTML='',3000); }
 
 document.getElementById('productForm').addEventListener('submit', async e=>{
   e.preventDefault();
-  const name=document.getElementById('name').value.trim();
-  const price=document.getElementById('price').value.trim();
-  const description=document.getElementById('description').value.trim();
-  const imageUrl=document.getElementById('imageUrl').value.trim();
-  try{
-    const res=await fetch(API,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({action:'add',name,price,description,imageUrl})
-    });
-    const j=await res.json();
-    if(res.ok) showAlert(j.message,'success'); else showAlert(j.message,'danger');
-    document.getElementById('productForm').reset();
-  }catch(err){
-    showAlert('Network error: '+err.message,'danger');
+  const name = encodeURIComponent(document.getElementById('name').value.trim());
+  const price = encodeURIComponent(document.getElementById('price').value.trim());
+  const description = encodeURIComponent(document.getElementById('description').value.trim());
+  const imageUrl = encodeURIComponent(document.getElementById('imageUrl').value.trim());
+
+  try {
+    const res = await fetch(`${API}?action=add&name=${name}&price=${price}&description=${description}&imageUrl=${imageUrl}`);
+    const j = await res.json();
+    showAlert(j.message, j.success ? 'success' : 'danger');
+    if(j.success) document.getElementById('productForm').reset();
+  } catch(err) {
+    showAlert('Network error: '+err.message, 'danger');
   }
 });
+
 </script>
 </body>
 </html>
